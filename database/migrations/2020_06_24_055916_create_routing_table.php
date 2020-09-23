@@ -50,7 +50,6 @@ class CreateRoutingTable extends Migration
             $table->string('action')->nullable();
 
             $table->boolean('public')->default(false); // auth or check
-            $table->integer('cache_lifetime')->default(-1); // cache request hit set -1 not cache
             $table->integer('limit')->default(-1); // limit hit per minutes set -1 unlimited hit
             $table->text('middleware')->nullable();
 
