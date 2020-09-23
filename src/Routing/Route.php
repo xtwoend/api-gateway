@@ -4,6 +4,8 @@ namespace Api\Gateway\Routing;
 use Api\Gateway\Presenters\JSONPresenter;
 use Api\Gateway\Presenters\PresenterContract;
 use Api\Gateway\Presenters\RawPresenter;
+use Api\Gateway\Services\Service;
+use Api\Gateway\Services\ServiceContract;
 
 /**
  * Class Route
@@ -27,10 +29,21 @@ class Route implements RouteContract
     protected $presenter;
 
     /**
-     * [$rateLimit description]
+     * [$services description]
      * @var [type]
      */
-    protected $rateLimit;
+    protected $services = [];
+
+    /**
+     * current handler services
+     */
+    protected $currentService;
+
+    /**
+     * [$middleware description]
+     * @var array
+     */
+    protected $middleware = [];
 
     /**
      * Route constructor.
@@ -39,7 +52,7 @@ class Route implements RouteContract
     public function __construct(array $options)
     {
         $this->config = $options;
-        $this->rateLimit = config('apigateway.rate_limit', 500);
+        $this->middleware = array_merge( array $options['middleware'], $this->middleware);
         $this->presenter = $this->isRaw() ? new RawPresenter() : new JSONPresenter();
     }
 
@@ -65,7 +78,7 @@ class Route implements RouteContract
      */
     public function getRateLimit()
     {
-        return $this->rateLimit;
+        return $this->config['limit']?? -1;
     }
 
     /**
@@ -118,16 +131,73 @@ class Route implements RouteContract
     }
 
     /**
-     * [getUrl description]
+     * [getAction description]
      * @return [type] [description]
      */
-    public function getUrl()
+    public function getAction()
     {
-        if($this->config['type'] == 'http'){
-            return $this->config['content'] ?? '';
+        return $this->config['action']?? $this->config['path'];
+    }
+
+    /**
+     * [addService description]
+     * @param [type] $service [description]
+     */
+    public function addService(ServiceContract $service)
+    {
+        $this->services[] = $service;
+
+        return $this;
+    }
+
+    /**
+     * [getCurrentHandler description]
+     * @return [type] [description]
+     */
+    public function getCurrentService(): int
+    {
+        return $this->currentService ?? 0;
+    }
+
+    /**
+     * [getMiddleware description]
+     * @return [type] [description]
+     */
+    public function getMiddleware(): array
+    {
+        return $this->middleware ?? [];
+    }
+
+    /**
+     * [setCurrentHandler description]
+     * @param int $index [description]
+     */
+    public function setCurrentService(int $index): void
+    {
+        $this->currentService = $index;
+    }
+
+    /**
+     * [getHandler description]
+     * @param  int    $index [description]
+     * @return [type]        [description]
+     */
+    public function getService(int $index): ?Service
+    {
+        $services = $this->getServices();
+        if (array_key_exists($index, $services)) {
+            return $services[$index];
         }
-        
-        return '';
+        return null;
+    }
+
+    /**
+     * [getServices description]
+     * @return [type] [description]
+     */
+    public function getServices()
+    {
+        return collect($this->services);
     }
 
     /**

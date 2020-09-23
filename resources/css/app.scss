@@ -1,0 +1,26 @@
+@import "normalize.scss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind screens;
+
+li {
+    padding-top: .25rem;
+    padding-bottom: .25rem;
+}
+
+.docs-index>ul>li>ul, 
+.docs-index h2 {
+    font-size: .875rem;
+}
+.docs-index h2 {
+    padding-bottom: .25rem;
+    margin-top: 0;
+    margin-bottom: .5rem;
+    border-bottom-width: 1px;
+    border-style: dotted;
+    --text-opacity: 1;
+    color: #1a202c;
+    color: rgba(26,32,44,var(--text-opacity));
+    text-transform: uppercase;
+}

@@ -13,10 +13,16 @@
 |
 */
 
-$router->get('/', function () use ($router) {
-	return app('hash')->make(123456);
-    // return $router->app->version();
-});
+// $router->get('/logs', 'LogController@index');
+// $router->get('/logs/data', 'LogController@logs');
 
-$router->get('/logs', 'LogController@index');
-$router->get('/logs/data', 'LogController@logs');
+// $router->group([
+// 	'prefix' => 'admin'
+// ], function() use ($router){
+// 	$router->get('/', 'AdminController@index');
+// 	$router->get('/{route:.*}', 'AdminController@index');
+// 	$router->post('/{route:.*}', 'AdminController@index');
+// 	$router->put('/{route:.*}', 'AdminController@index');
+// 	$router->patch('/{route:.*}', 'AdminController@index');
+// 	// $router->delete('/{route:.*}', 'AdminController@index');
+// });

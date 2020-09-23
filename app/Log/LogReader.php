@@ -7,7 +7,6 @@ class LogReader
     protected $final = [];
     protected $config = [];
 
-
     public function __construct($config = [])
     {
         if (array_key_exists('date', $config)) {
@@ -15,9 +14,7 @@ class LogReader
         } else {
             $this->config['date'] = null;
         }
-
     }
-
 
     public function getLogFileDates()
     {
@@ -36,7 +33,6 @@ class LogReader
 
     public function get()
     {
-
         $availableDates = $this->getLogFileDates();
 
         if (count($availableDates) == 0) {
@@ -57,7 +53,6 @@ class LogReader
                 'message' => 'No log file found with selected date ' . $configDate
             ]);
         }
-
 
         $pattern = "/^\[(?<date>.*)\]\s(?<env>\w+)\.(?<type>\w+):\s\[\s(?<url>.*)\s\]\s(?<message>.*)/m";
 

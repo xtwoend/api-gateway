@@ -23,10 +23,6 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 
-// $app = new Dusterio\LumenPassport\Lumen7Application(
-//     dirname(__DIR__)
-// );
-
 $app->withFacades();
 $app->withEloquent();
 
@@ -109,6 +105,10 @@ $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 
 $app->register(Api\Gateway\ApiGatewayServiceProvider::class);
+
+if (class_exists('Laravel\Tinker\TinkerServiceProvider')) {
+    $app->register(Laravel\Tinker\TinkerServiceProvider::class);
+}
 
 /*
 |--------------------------------------------------------------------------

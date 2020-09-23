@@ -15,5 +15,5 @@ interface ServiceRegistryContract
      * @param $serviceId
      * @return string
      */
-    public function resolveInstance($serviceId);
+    public function resolveInstance($services): ?string;
 }

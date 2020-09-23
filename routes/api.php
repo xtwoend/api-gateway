@@ -1,4 +1,4 @@
 <?php
 
-$router->post('/auth', '\Dusterio\LumenPassport\Http\Controllers\AccessTokenController@issueToken');
+// $router->post('/auth', '\Dusterio\LumenPassport\Http\Controllers\AccessTokenController@issueToken');
 

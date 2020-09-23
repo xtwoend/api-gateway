@@ -2,6 +2,7 @@
 
 namespace Api\Gateway\Routing;
 
+use Api\Gateway\Services\Service;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
@@ -73,10 +74,12 @@ class RouteRegistry
             $method = strtolower($route->getMethod());
 
             $middleware = [ 'helper:' . $route->getId() ];
-            $middleware[] = 'throttle:'. $route->getRateLimit() .',60';
-            $middleware[] = 'logger';
-
+    
+            if (config('apigateway.logger.enable')) $middleware[] = 'logger';
+            if (! $route->getRateLimit() > 0) $middleware[] = 'throttle:'. $route->getRateLimit() .',60';
             if (! $route->isPublic()) $middleware[] = 'auth';
+
+            $middleware = is_array($route->getMiddleware())? array_merge($route->getMiddleware(), $middleware);
 
             $app->router->{$method}($route->getPath(), [
                 'uses' => 'Api\Gateway\Http\GatewayController@' . $method,
@@ -122,38 +125,23 @@ class RouteRegistry
      */
     public static function initFromModel($route)
     {
-        $registry = new self;
+        $routes = [];
 
-        if(Config::get('apigateway.cache')){
-            $routes = Cache::remember('apigateway.routes', Config::get('apigateway.cache_lifetime'), 
-            function () use ($route) {
-                return (new $route)->active()->get()->toArray();
-            });
-        }else{
-            $routes = (new $route)->active()->get()->toArray();
+        try {
+            $registry = new self;
+
+            if(Config::get('apigateway.cache', false)){
+                $routes = Cache::remember('apigateway.routes', Config::get('apigateway.cache_lifetime'), 
+                    function () use ($route) {
+                        return (new $route)->with('services')->active()->get()->toArray();
+                });
+            }else{
+                $routes = (new $route)->with('services')->active()->get()->toArray();
+            }
+        } catch (\Exception $e) {
+            
         }
-
-        return $registry->parseRoutes($routes)->parseConfigRoutes();
-    }
-
-    /**
-     * [initFromDb description]
-     * @param  [type] $tableName [description]
-     * @return [type]            [description]
-     */
-    public static function initFromDb($tableName)
-    {
-        $registry = new self;
-
-        if(Config::get('apigateway.cache')){
-            $routes = Cache::remember('apigateway.routes', Config::get('apigateway.cache_lifetime'), 
-            function () use ($tableName) {
-                return DB::table($tableName)->where('active', 1)->get()->toArray();
-            });
-        }else{
-            $routes = DB::table($tableName)->where('active', 1)->get()->toArray();
-        }
-    
+        
         return $registry->parseRoutes($routes)->parseConfigRoutes();
     }
 
@@ -168,7 +156,14 @@ class RouteRegistry
             if (! isset($routeDetails['id'])) {
                 $routeDetails['id'] = (string) Uuid::generate(4);
             }
+            
+            $services = $routeDetails['services'];
+            unset($routeDetails['services']);
+
             $route = new Route($routeDetails);
+            collect($services)->each(function ($service) use ($route) {
+                $route->addService(Service::createFromArray((array) $service));
+            });
 
             $this->addRoute($route);
         });

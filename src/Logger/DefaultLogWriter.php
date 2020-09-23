@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class DefaultLogWriter implements LogWriter
 {
-    public function logRequest(Request $request, Response $response)
+    public function logRequest(Request $request, $response)
     {
         $method = strtoupper($request->getMethod());
 

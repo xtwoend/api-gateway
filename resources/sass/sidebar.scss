@@ -1,0 +1,26 @@
+.docs-index>ul>li>ul, .docs-index h2 {
+    font-size: .875rem;
+}
+
+.docs-index h2 {
+    padding-bottom: .25rem;
+    margin-top: 0;
+    margin-bottom: .5rem;
+    border-bottom-width: 1px;
+    border-style: dotted;
+    --text-opacity: 1;
+    color: #1a202c;
+    color: rgba(26,32,44,var(--text-opacity));
+    text-transform: uppercase;
+}
+
+a.is-active {
+    font-weight: 500;
+}
+
+a.is-active, 
+a:hover {
+    --text-opacity: 1;
+    color: #4299e1;
+    color: rgba(66,153,225,var(--text-opacity));
+}

@@ -38,6 +38,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     public function findForPassport($email)
     {
+
         return $this->where('email', $email)->first();
     }
 }

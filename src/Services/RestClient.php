@@ -33,7 +33,8 @@ class RestClient
      */
     protected $guzzleParams = [
         'headers' => [],
-        'timeout' => 40
+        'timeout' => 20,
+        // 'debug' => true,
     ];
 
     /**
@@ -66,7 +67,7 @@ class RestClient
                 'X-Token-Scopes' => $request->user() && ! empty($request->user()->token()) ? implode(',', $request->user()->token()->scopes) : '',
                 'X-Client-Ip' => $request->getClientIp(),
                 'User-Agent' => $request->header('User-Agent'),
-                // 'Authorization' => $request->header('Authorization'),
+                'Authorization' => $request->header('Authorization'),
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
             ]
@@ -267,10 +268,11 @@ class RestClient
      */
     private function buildUrl(RouteContract $route, $parametersJar)
     {
-        $url = $this->injectParams($route->getUrl(), $parametersJar);
+        $action = $route->getAction();
+        $services = $route->getServices();
+        $url = $this->injectParams($action, $parametersJar);
         if (isset($parametersJar['query_string'])) $url .= '?' . $parametersJar['query_string'];
 
-        return $url;
+        return $this->services->resolveInstance($services) . $url;
     }
-
 }

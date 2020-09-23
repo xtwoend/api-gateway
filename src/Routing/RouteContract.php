@@ -3,6 +3,8 @@
 namespace Api\Gateway\Routing;
 
 use Api\Gateway\Presenters\PresenterContract;
+use Api\Gateway\Services\Service;
+use Api\Gateway\Services\ServiceContract;
 use Illuminate\Support\Collection;
 
 /**
@@ -44,10 +46,41 @@ interface RouteContract
     public function getContent();
 
     /**
-     * [getUrl description]
+     * [getAction description]
      * @return [type] [description]
      */
-    public function getUrl();
+    public function getAction();
+
+    /**
+     * [addService description]
+     * @param ServiceContract $service [description]
+     */
+    public function addService(ServiceContract $service);
+
+    /**
+     * [getCurrentService description]
+     * @return [type] [description]
+     */
+    public function getCurrentService(): int;
+
+    /**
+     * [setCurrentService description]
+     * @param int $index [description]
+     */
+    public function setCurrentService(int $index): void;
+
+    /**
+     * [getService description]
+     * @param  int    $index [description]
+     * @return [type]        [description]
+     */
+    public function getService(int $index): ?Service;
+
+    /**
+     * [getServices description]
+     * @return [type] [description]
+     */
+    public function getServices();
 
     /**
      * [getType description]
@@ -59,6 +92,11 @@ interface RouteContract
      * @return bool
      */
     public function isPublic();
+
+    /**
+     * @return array middleware name
+     */
+    public function getMiddleware();
 
     /**
      * @return PresenterContract

@@ -16,7 +16,7 @@ class UnableToExecuteRequestException extends \Exception
     public function __construct(Response $response = null)
     {
         if ($response) {
-            parent::__construct((string)$response->getBody(), $response->getStatusCode());
+            parent::__construct((string) $response->getBody(), $response->getStatusCode());
             return;
         }
 

@@ -9,6 +9,12 @@ use Illuminate\Http\Response;
  */
 interface PresenterContract
 {
+	/**
+	 * [setHeaders description]
+	 * @param array $headers [description]
+	 */
+	public function setHeaders(array $headers = []);
+
     /**
      * @param array|string $input
      * @param $code

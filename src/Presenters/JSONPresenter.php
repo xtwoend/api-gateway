@@ -10,7 +10,23 @@ use Illuminate\Http\Response;
  * @package Api\Gateway\Presenters
  */
 class JSONPresenter implements PresenterContract
-{
+{   
+    /**
+     * [$headers description]
+     * @var array
+     */
+    protected $headers = [];
+
+    /**
+     * [setHeaders description]
+     * @param array $headers [description]
+     */
+    public function setHeaders($headers =[])
+    {
+        $this->headers = $headers;
+        return $this;
+    }
+
     /**
      * @param $input
      * @return array
@@ -41,9 +57,10 @@ class JSONPresenter implements PresenterContract
 
         $serialized = is_array($input) ? $this->formatArray($input) : $this->formatString($input);
 
-        return new Response($serialized, $code, [
-            'Content-Type' => 'application/json'
-        ]);
+        return new Response($serialized, $code, array_merge([
+            'Content-Type' => 'application/json',
+            'Gateway-Version' => config('apigateway.version', 'v1'),
+        ], $this->headers));
     }
 
     /**

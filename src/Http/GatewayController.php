@@ -28,6 +28,12 @@ class GatewayController extends Controller
     protected $presenter;
 
     /**
+     * [$service description]
+     * @var [type]
+     */
+    protected $services;
+
+    /**
      * GatewayController constructor.
      * @param Request $request
      * @throws DataFormatException
@@ -36,13 +42,11 @@ class GatewayController extends Controller
     public function __construct(Request $request)
     {
         if (empty($request->getRoute())) throw new DataFormatException('Unable to find original URI pattern');
-
         $this->config = $request
             ->getRoute()
             ->getConfig();
-
         $this->route = $request->getRoute();
-
+        $this->services = $request->getRoute()->getServices();
         $this->presenter = $request
             ->getRoute()
             ->getPresenter();
@@ -96,6 +100,8 @@ class GatewayController extends Controller
      */
     private function simpleRequest(Request $request, RestClient $client)
     {
+        $start = microtime(true);
+
         if($this->route->getType() === 'echo'){
             return $this->echoRequest($request);
         }
@@ -105,30 +111,41 @@ class GatewayController extends Controller
         }
 
         $client->setBody($request->getContent());
-  
         if (count($request->allFiles()) !== 0) {
             $client->setFiles($request->allFiles());
         }
 
         $parametersJar = array_merge($request->getRouteParams(), ['query_string' => $request->getQueryString()]);
-
         $response = $client->syncRequest($this->route, $parametersJar);
-        
-        return $this->presenter->format((string)$response->getBody(), $response->getStatusCode());
-    }
 
+        $execution = microtime(true) - $start;
+        
+        return $this->presenter
+            ->setHeaders(['Time-Execution' => $execution, 'X-Mode' => $this->route->getType()])
+            ->format((string) $response->getBody(), $response->getStatusCode());
+    }
 
     private function echoRequest(Request $request)
     {
+        $start = microtime(true);
+
         $parametersJar = array_merge($request->getRouteParams(), ['query_string' => $request->getQueryString()]);
 
-        return $this->presenter->format((string) $request->getContent(), 200);
+        $execution = microtime(true) - $start;
+        
+        return $this->presenter
+            ->setHeaders(['Time-Execution' => $execution, 'X-Mode' => $this->route->getType()])
+            ->format((string) $request->getContent(), 200);
     }
 
     private function mockRequest(Request $request)
     {   
+        $start = microtime(true);
+
         $parametersJar = array_merge($request->getRouteParams(), ['query_string' => $request->getQueryString()]);
 
-        return $this->presenter->format((string) $this->route->getContent(), 200);
+        return $this->presenter
+            ->setHeaders(['Time-Execution' => $execution, 'X-Mode' => $this->route->getType()])
+            ->format((string) $this->route->getContent(), 200);
     }
 }
