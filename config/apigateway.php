@@ -28,6 +28,12 @@ return [
         'timeout' => 20,
         'connect_timeout' => 20
     ],
+    'circuit_breaker' => [
+        'time_window' => 30, // pengecekan dalam kurun waktu (seconds) dalam ambang batas
+        'failure_rate_threshold' => 30, // Ambang batas tingkat kegagalan dalam persentase yang mengubah status CircuitBreaker menjadi `OPEN`.
+        'interval_to_halfopen' => 10, // Interval (detik) untuk mengubah status CircuitBreaker dari `OPEN` menjadi` HALF_OPEN`.
+        'minimum_request' => 10, // Jumlah minimum permintaan untuk mendeteksi kegagalan.
+    ],
 	'logger' => [
         'enable' => true,
 		'channel' => 'http',

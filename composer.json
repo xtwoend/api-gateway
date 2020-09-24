@@ -6,9 +6,11 @@
     "type": "project",
     "require": {
         "php": "^7.2.5",
+        "ackintosh/ganesha": "^1.1",
         "breeze2/slumen": "^1.3",
         "dusterio/lumen-passport": "^0.2.19",
         "guzzlehttp/guzzle": "^7.0",
+        "illuminate/redis": "^7.0",
         "laravel/lumen-framework": "^7.0"
     },
     "require-dev": {

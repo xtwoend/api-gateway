@@ -52,7 +52,7 @@ class Route implements RouteContract
     public function __construct(array $options)
     {
         $this->config = $options;
-        $this->middleware = array_merge( array $options['middleware'], $this->middleware);
+        $this->middleware = $options['middleware'];
         $this->presenter = $this->isRaw() ? new RawPresenter() : new JSONPresenter();
     }
 
@@ -165,7 +165,8 @@ class Route implements RouteContract
      */
     public function getMiddleware(): array
     {
-        return $this->middleware ?? [];
+        $this->middleware = explode(',', $this->config['middleware'])?? [];
+        return $this->middleware;
     }
 
     /**

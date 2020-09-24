@@ -79,7 +79,7 @@ class RouteRegistry
             if (! $route->getRateLimit() > 0) $middleware[] = 'throttle:'. $route->getRateLimit() .',60';
             if (! $route->isPublic()) $middleware[] = 'auth';
 
-            $middleware = is_array($route->getMiddleware())? array_merge($route->getMiddleware(), $middleware);
+            $middleware = is_array($route->getMiddleware())? array_merge($route->getMiddleware(), $middleware): $middleware;
 
             $app->router->{$method}($route->getPath(), [
                 'uses' => 'Api\Gateway\Http\GatewayController@' . $method,

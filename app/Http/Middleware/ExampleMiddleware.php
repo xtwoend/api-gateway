@@ -15,6 +15,10 @@ class ExampleMiddleware
      */
     public function handle($request, Closure $next)
     {
-        return $next($request);
+        $response = $next($request);
+
+        $response->header('X-KYC-User', 1);
+
+        return $response;
     }
 }

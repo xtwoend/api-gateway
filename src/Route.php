@@ -9,9 +9,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Route extends Model
 {
-	protected $casts = [
-        'middleware' => 'array',
-    ];
+	// protected $casts = [
+ //        'middleware' => 'array',
+ //    ];
 
 	public function group()
 	{

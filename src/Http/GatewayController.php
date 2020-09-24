@@ -120,6 +120,12 @@ class GatewayController extends Controller
 
         $execution = microtime(true) - $start;
         
+        if(is_null($response)){
+            return $this->presenter
+                ->setHeaders(['Time-Execution' => $execution, 'X-Mode' => $this->route->getType()])
+                ->format("", 500);
+        }
+
         return $this->presenter
             ->setHeaders(['Time-Execution' => $execution, 'X-Mode' => $this->route->getType()])
             ->format((string) $response->getBody(), $response->getStatusCode());

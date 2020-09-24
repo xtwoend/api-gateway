@@ -2,12 +2,16 @@
 
 namespace Api\Gateway\Services;
 
+use Ackintosh\Ganesha\Builder;
+use Ackintosh\Ganesha\Exception\RejectedException;
+use Ackintosh\Ganesha\GuzzleMiddleware;
 use Api\Gateway\Exceptions\UnableToExecuteRequestException;
 use Api\Gateway\Request;
 use Api\Gateway\Routing\RouteContract;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Promise;
 use GuzzleHttp\Psr7\Response as PsrResponse;
 use Illuminate\Http\UploadedFile;
@@ -53,7 +57,8 @@ class RestClient
         $this->client = $client;
         $this->services = $services;
         $this->injectHeaders($request);
-        $this->guzzleParams['timeout'] = config('gateway.global.timeout');
+        $this->guzzleParams['timeout'] = config('apigateway.global.timeout');
+        $this->circuitBreaker();
     }
 
     /**
@@ -67,7 +72,7 @@ class RestClient
                 'X-Token-Scopes' => $request->user() && ! empty($request->user()->token()) ? implode(',', $request->user()->token()->scopes) : '',
                 'X-Client-Ip' => $request->getClientIp(),
                 'User-Agent' => $request->header('User-Agent'),
-                'Authorization' => $request->header('Authorization'),
+                // 'Authorization' => $request->header('Authorization'),
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json'
             ]
@@ -162,6 +167,30 @@ class RestClient
     }
 
     /**
+     * [circuitBreaker description]
+     * @return [type] [description]
+     */
+    public function  circuitBreaker()
+    {
+        $redis = app('redis');
+        $adapter = new RedisLumenAdapter($redis);
+
+        $circuitBreaker = Builder::withRateStrategy()
+            ->timeWindow(config('apigateway.circuit_breaker.time_window', 30))
+            ->failureRateThreshold(config('apigateway.circuit_breaker.failure_rate_threshold', 50))
+            ->minimumRequests(config('apigateway.circuit_breaker.minimum_request', 10))
+            ->intervalToHalfOpen(config('apigateway.circuit_breaker.interval_to_halfopen', 10))
+            ->adapter($adapter)
+            ->build();
+
+        $middleware = new GuzzleMiddleware($circuitBreaker);
+        $handlers = HandlerStack::create();
+        $handlers->push($middleware);
+
+        $this->guzzleParams['handler'] = $handlers;
+    }
+
+    /**
      * @param $url
      * @return \Psr\Http\Message\ResponseInterface
      */
@@ -209,6 +238,12 @@ class RestClient
             $response = $this->{strtolower($route->getMethod())}(
                 $this->buildUrl($route, $parametersJar)
             );
+        } catch (RejectedException $e) {
+            // rejected service with circuit braker
+            // TODO
+            // set service jadi down.
+            
+            throw new UnableToExecuteRequestException();
         } catch (ConnectException $e) {
             throw new UnableToExecuteRequestException();
         } catch (RequestException $e) {
