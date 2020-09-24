@@ -9,10 +9,6 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Route extends Model
 {
-	// protected $casts = [
- //        'middleware' => 'array',
- //    ];
-
 	public function group()
 	{
 		return $this->belongsTo(Group::class);

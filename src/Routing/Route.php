@@ -165,7 +165,8 @@ class Route implements RouteContract
      */
     public function getMiddleware(): array
     {
-        $this->middleware = explode(',', $this->config['middleware'])?? [];
+        $middleware = explode(',', $this->config['middleware']);
+        $this->middleware = array_filter($middleware, fn($value) => !is_null($value) && $value !== '');
         return $this->middleware;
     }
 

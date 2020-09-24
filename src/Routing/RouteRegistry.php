@@ -74,13 +74,15 @@ class RouteRegistry
             $method = strtolower($route->getMethod());
 
             $middleware = [ 'helper:' . $route->getId() ];
-    
-            if (config('apigateway.logger.enable')) $middleware[] = 'logger';
-            if (! $route->getRateLimit() > 0) $middleware[] = 'throttle:'. $route->getRateLimit() .',60';
+            if ($route->getRateLimit() > 0) $middleware[] = 'throttle:'. $route->getRateLimit() .',60';
+
             if (! $route->isPublic()) $middleware[] = 'auth';
-
-            $middleware = is_array($route->getMiddleware())? array_merge($route->getMiddleware(), $middleware): $middleware;
-
+            if (config('apigateway.logger.enable')) $middleware[] = 'logger';
+            
+            foreach($route->getMiddleware() as $mid) {
+                array_push($middleware, $mid);
+            }
+            
             $app->router->{$method}($route->getPath(), [
                 'uses' => 'Api\Gateway\Http\GatewayController@' . $method,
                 'middleware' => $middleware
