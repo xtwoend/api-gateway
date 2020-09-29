@@ -5,6 +5,7 @@ namespace Api\Gateway\Services;
 use Ackintosh\Ganesha\Builder;
 use Ackintosh\Ganesha\Exception\RejectedException;
 use Ackintosh\Ganesha\GuzzleMiddleware;
+use Api\Gateway\Events\HealthServiceMonitor;
 use Api\Gateway\Exceptions\UnableToExecuteRequestException;
 use Api\Gateway\Request;
 use Api\Gateway\Routing\RouteContract;
@@ -242,8 +243,11 @@ class RestClient
             // rejected service with circuit braker
             // TODO
             // set service jadi down.
-            
+            $service = $services->first();
+            event( new HealthServiceMonitor($service));
+
             throw new UnableToExecuteRequestException();
+            
         } catch (ConnectException $e) {
             throw new UnableToExecuteRequestException();
         } catch (RequestException $e) {

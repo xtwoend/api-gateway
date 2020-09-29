@@ -22,8 +22,11 @@ return [
         '172.31.0.0/16', // Rancher
         '10.42.0.0/16' // Rancher
 	],
-	'cache' => false,
-	'cache_lifetime' => 5 * 360,
+    'cache_response' => false,
+    'route' => [
+    	'cache' => false,
+    	'cache_lifetime' => 5 * 360
+    ],
     'global' => [
         'timeout' => 20,
         'connect_timeout' => 20

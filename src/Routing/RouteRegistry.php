@@ -77,6 +77,7 @@ class RouteRegistry
             if ($route->getRateLimit() > 0) $middleware[] = 'throttle:'. $route->getRateLimit() .',60';
 
             if (! $route->isPublic()) $middleware[] = 'auth';
+            if (config('apigateway.cache_response')) $middleware[] = 'cache';
             if (config('apigateway.logger.enable')) $middleware[] = 'logger';
             
             foreach($route->getMiddleware() as $mid) {
@@ -132,8 +133,8 @@ class RouteRegistry
         try {
             $registry = new self;
 
-            if(Config::get('apigateway.cache', false)){
-                $routes = Cache::remember('apigateway.routes', Config::get('apigateway.cache_lifetime'), 
+            if(Config::get('apigateway.route.cache', false)){
+                $routes = Cache::remember('apigateway.routes', Config::get('apigateway.route.cache_lifetime'), 
                     function () use ($route) {
                         return (new $route)->with('services')->active()->get()->toArray();
                 });

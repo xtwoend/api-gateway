@@ -6,6 +6,8 @@ use Illuminate\Support\Arr;
 
 class Service implements ServiceContract
 {
+    private $id;
+
     private $name;
 
     private $host;
@@ -23,6 +25,7 @@ class Service implements ServiceContract
     private $hit;
 
     public function __construct(
+        int $id,
         string $name,
         string $host,
         ?string $healthCheckPath = null,
@@ -32,6 +35,7 @@ class Service implements ServiceContract
         bool $down = false,
         int $hit = 0
     ) {
+        $this->id = $id;
         $this->name = $name;
         $this->host = $host;
         $this->healthCheckPath = $healthCheckPath;
@@ -44,10 +48,11 @@ class Service implements ServiceContract
 
     public static function createFromArray(array $service): self
     {
+        array_key_exists('id', $service);
         array_key_exists('name', $service);
         array_key_exists('host', $service);
         array_key_exists('health_check_path', $service);
-
+        
         $prefix = null;
         $limit = -1;
         $weight = 1;
@@ -74,12 +79,13 @@ class Service implements ServiceContract
             $hit = $service['hit'];
         }
 
-        return new self($service['name'], $service['host'], $service['health_check_path'], $prefix, $limit, $weight, $down, $hit);
+        return new self($service['id'], $service['name'], $service['host'], $service['health_check_path'], $prefix, $limit, $weight, $down, $hit);
     }
 
     public function toArray(): array
     {
         return [
+            'id' => $this->getId(),
             'name' => $this->getName(),
             'host' => $this->getHost(),
             'health_check_path' => $this->getHealthCheckPath(),
@@ -90,6 +96,11 @@ class Service implements ServiceContract
             'down' => $this->isDown(),
             'hit' => $this->getHit(),
         ];
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 
     public function getName(): string

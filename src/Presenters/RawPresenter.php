@@ -36,7 +36,8 @@ class RawPresenter implements PresenterContract
 
         return new Response($input, $code, array_merge([
             'Content-Type' => 'application/json',
-            'Gateway-Version' => config('apigateway.version', 'v1'),
+            'Connection' => 'close',
+            'X-Gateway-Version' => config('apigateway.version', 'v1')
         ], $this->headers));
     }
 }

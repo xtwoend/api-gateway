@@ -59,7 +59,8 @@ class JSONPresenter implements PresenterContract
 
         return new Response($serialized, $code, array_merge([
             'Content-Type' => 'application/json',
-            'Gateway-Version' => config('apigateway.version', 'v1'),
+            'X-Gateway-Version' => config('apigateway.version', 'v1'),
+            'Connection' => 'close'
         ], $this->headers));
     }
 

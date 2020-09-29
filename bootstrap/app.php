@@ -61,6 +61,7 @@ $app->singleton(
 $app->configure('auth');
 $app->configure('logging');
 $app->configure('apigateway');
+$app->configure('gateway-cache');
 
 
 /*
@@ -82,7 +83,8 @@ $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
     'helper' => Api\Gateway\Middleware\HelperMiddleware::class,
     'throttle' => Api\Gateway\Middleware\ThrottleRequests::class,
-    'logger' => Api\Gateway\Middleware\HttpLogger::class
+    'logger' => Api\Gateway\Middleware\HttpLogger::class,
+    'cache' => Growinc\LibGatewayCache\GatewayCache::class,
 ]);
 
 /*

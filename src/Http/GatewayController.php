@@ -119,15 +119,15 @@ class GatewayController extends Controller
         $response = $client->syncRequest($this->route, $parametersJar);
 
         $execution = microtime(true) - $start;
-        
+        $headers = array_merge($response->getHeaders(), ['X-Time-Execution' => $execution, 'X-Mode' => $this->route->getType()]);
         if(is_null($response)){
             return $this->presenter
-                ->setHeaders(['Time-Execution' => $execution, 'X-Mode' => $this->route->getType()])
+                ->setHeaders($headers)
                 ->format("", 500);
         }
 
         return $this->presenter
-            ->setHeaders(['Time-Execution' => $execution, 'X-Mode' => $this->route->getType()])
+            ->setHeaders($headers)
             ->format((string) $response->getBody(), $response->getStatusCode());
     }
 
@@ -140,7 +140,7 @@ class GatewayController extends Controller
         $execution = microtime(true) - $start;
         
         return $this->presenter
-            ->setHeaders(['Time-Execution' => $execution, 'X-Mode' => $this->route->getType()])
+            ->setHeaders(['X-Time-Execution' => $execution, 'X-Mode' => $this->route->getType()])
             ->format((string) $request->getContent(), 200);
     }
 
@@ -151,7 +151,7 @@ class GatewayController extends Controller
         $parametersJar = array_merge($request->getRouteParams(), ['query_string' => $request->getQueryString()]);
 
         return $this->presenter
-            ->setHeaders(['Time-Execution' => $execution, 'X-Mode' => $this->route->getType()])
+            ->setHeaders(['X-Time-Execution' => $execution, 'X-Mode' => $this->route->getType()])
             ->format((string) $this->route->getContent(), 200);
     }
 }
