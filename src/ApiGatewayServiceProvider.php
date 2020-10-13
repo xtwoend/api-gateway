@@ -112,12 +112,16 @@ class ApiGatewayServiceProvider extends ServiceProvider
 
     protected function cacheServices()
     {
-        $services = Service::all();
-        $cache = $this->app->make('cache');
-        foreach($services as $service){
-            if($cache->has($service->name))
-                continue;
-            $cache->put($service->name, $service->toArray(), config('apigateway.route.cache_lifetime', 86400));
+        try {
+            $services = Service::all();
+            $cache = $this->app->make('cache');
+            foreach($services as $service){
+                if($cache->has($service->name))
+                    continue;
+                $cache->put($service->name, $service->toArray(), config('apigateway.route.cache_lifetime', 86400));
+            }
+        } catch (\Exception $e) {
+            Log::info('Not adding any services cache');
         }
     }
 }
