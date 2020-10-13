@@ -13,6 +13,10 @@
 |
 */
 
+$router->get('/health', function(){
+	return 'ok';
+});
+
 // $router->get('/logs', 'LogController@index');
 // $router->get('/logs/data', 'LogController@logs');
 

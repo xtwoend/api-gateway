@@ -1,0 +1,5 @@
+_HiStOrY_V2_
+$db=app('database');
+$db=app('databases');
+$db=app('databases');
+$db=app('databases');

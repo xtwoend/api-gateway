@@ -9,6 +9,7 @@ use Api\Gateway\Logger\LogWriter;
 use Api\Gateway\Request;
 use Api\Gateway\Route;
 use Api\Gateway\Routing\RouteRegistry;
+use Api\Gateway\Service;
 use Api\Gateway\Services\DNSRegistry;
 use Api\Gateway\Services\Resolver;
 use Api\Gateway\Services\ServiceRegistryContract;
@@ -50,6 +51,7 @@ class ApiGatewayServiceProvider extends ServiceProvider
         $this->app->alias(Request::class, 'request');
 
         $this->registerRoutes();
+        $this->cacheServices();
 	}
 
     /**
@@ -107,4 +109,15 @@ class ApiGatewayServiceProvider extends ServiceProvider
 
         $registry->bind(app());
 	}
+
+    protected function cacheServices()
+    {
+        $services = Service::all();
+        $cache = $this->app->make('cache');
+        foreach($services as $service){
+            if($cache->has($service->name))
+                continue;
+            $cache->put($service->name, $service->toArray(), config('apigateway.route.cache_lifetime', 86400));
+        }
+    }
 }

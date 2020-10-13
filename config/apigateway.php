@@ -22,9 +22,9 @@ return [
         '172.31.0.0/16', // Rancher
         '10.42.0.0/16' // Rancher
 	],
-    'cache_response' => false,
+    'cache_response' => true,
     'route' => [
-    	'cache' => false,
+    	'cache' => true,
     	'cache_lifetime' => 5 * 360
     ],
     'global' => [

@@ -20,3 +20,6 @@ $router->get('cache', function(){
 		    'Cache-Control' => 'max-age=100, public'
 		]);
 });
+
+
+$router->get('services', 'ServiceController@index');

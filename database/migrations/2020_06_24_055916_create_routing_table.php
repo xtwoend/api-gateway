@@ -15,7 +15,7 @@ class CreateRoutingTable extends Migration
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->index()->unique();
             $table->string('host');
             $table->boolean('enabled')->default(false);
             $table->string('prefix', 50)->nullable()->default('api');
