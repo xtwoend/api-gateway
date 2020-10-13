@@ -22,9 +22,9 @@ return [
         '172.31.0.0/16', // Rancher
         '10.42.0.0/16' // Rancher
 	],
-    'cache_response' => true,
+    'cache_response' => env('API_RESPONSE_CACHE', false),
     'route' => [
-    	'cache' => true,
+    	'cache' => env('API_ROUTE_CACHE', false),
     	'cache_lifetime' => 5 * 360
     ],
     'global' => [

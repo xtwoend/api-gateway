@@ -21,6 +21,6 @@ class Route extends Model
 
 	public function scopeActive($query)
 	{
-		return $query->where('down', 0);
+		return $query->where('active', 1);
 	}
 }
