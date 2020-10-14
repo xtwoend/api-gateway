@@ -23,6 +23,8 @@ class ServiceController extends Controller
      */
     public function index()
     {
+        // return request()->headers;
+
         return Service::all();
     }
 }

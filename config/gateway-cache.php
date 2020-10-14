@@ -6,9 +6,9 @@ return [
         // storage dengan filesystem
         'adapter' => [
             'name' => env('API_RESPONSE_CACHE_ADAPTER','filesystem'),
-            // 'options' => [
-            //     'cache_dir' => storage_path('app/cache')
-            // ]
+            'options' => [
+                'cache_dir' => storage_path('app/cache')
+            ]
         ],
         'plugins' => [
             'exception_handler' => [

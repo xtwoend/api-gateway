@@ -19,7 +19,11 @@ date_default_timezone_set(env('APP_TIMEZONE', 'UTC'));
 |
 */
 
-$app = new Laravel\Lumen\Application(
+// $app = new Laravel\Lumen\Application(
+//     dirname(__DIR__)
+// );
+
+$app = new \Dusterio\LumenPassport\Lumen7Application(
     dirname(__DIR__)
 );
 
@@ -37,9 +41,13 @@ $app->withEloquent();
 |
 */
 
+// $app->singleton(
+//     Illuminate\Contracts\Debug\ExceptionHandler::class,
+//     App\Exceptions\Handler::class
+// );
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
-    App\Exceptions\Handler::class
+    Api\Gateway\Exceptions\ApiHandler::class
 );
 
 $app->singleton(
@@ -60,9 +68,12 @@ $app->singleton(
 
 $app->configure('auth');
 $app->configure('logging');
+$app->configure('database');
 $app->configure('apigateway');
 $app->configure('gateway-cache');
 
+// for generate api docs
+$app->configure('swagger-lume');
 
 /*
 |--------------------------------------------------------------------------
@@ -107,8 +118,14 @@ $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 
 $app->register(Illuminate\Redis\RedisServiceProvider::class);
-
 $app->register(Api\Gateway\ApiGatewayServiceProvider::class);
+
+
+// swagger ui for api docs
+$app->register(\SwaggerLume\ServiceProvider::class);
+
+// db for logger
+$app->register(Jenssegers\Mongodb\MongodbServiceProvider::class);
 
 if (class_exists('Laravel\Tinker\TinkerServiceProvider')) {
     $app->register(Laravel\Tinker\TinkerServiceProvider::class);

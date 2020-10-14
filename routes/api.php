@@ -22,4 +22,4 @@ use Illuminate\Support\Facades\Cache;
 // });
 
 
-// $router->get('services', 'ServiceController@index');
+$router->get('api/services', 'ServiceController@index');

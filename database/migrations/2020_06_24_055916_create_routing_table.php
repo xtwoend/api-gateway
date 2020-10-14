@@ -39,6 +39,7 @@ class CreateRoutingTable extends Migration
             $table->string('path');
             $table->string('description')->nullable();
             $table->string('environment')->nullable()->comment('environment api service exp prod, dev, staging');
+            $table->text('parameters')->nullable()->comment('to define the requirements of the parameters');
 
             $table->string('type')->default('http')->comment('http, echo, mock');
             $table->string('method')->nullable()->comment('GET,POST,PUT,DELETE,PATCH');
@@ -55,7 +56,8 @@ class CreateRoutingTable extends Migration
 
             $table->tinyInteger('priority')->default(1);
             $table->tinyInteger('timeout')->default(30); // request timeout in seconds
-            $table->boolean('active')->default(FALSE);
+            $table->boolean('active')->default(false);
+            $table->boolean('deprecated')->default(false);
             
             $table->foreignId('group_id');
             $table->foreignId('user_id');

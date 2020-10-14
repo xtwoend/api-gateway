@@ -1,0 +1,74 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Api Documentation",
+        "description": "This api documentation for growinc open api",
+        "version": "1.0.0"
+    },
+    "host": "gateway.loc",
+    "servers": [
+        {
+            "url": "https://gateway.loc/api"
+        },
+        {
+            "url": "http://gateway.loc/api"
+        }
+    ],
+    "basePath": "\/",
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        },
+        "responses": {
+            "UnauthorizedError": {
+                "description": "Access token is missing or invalid"
+            }
+        }
+    },
+    "paths": {
+        "\/users": {
+            "get": {
+                "summary": "Return all the details of a user",
+                "description": "Returns the user's first name, last name and address Please see the documentation [here](https://example.com/users) for more information",
+                "deprecated": true,
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "page",
+                        "type": "integer",
+                        "required": false,
+                        "description": ""
+                    }
+                ]
+            }
+        },
+        "\/services": {
+            "get": {
+                "summary": "return all services available on growinc",
+                "description": "for details please contact me",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ok"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/UnauthorizedError"
+                    }
+                }
+            }
+        } 
+    }
+}

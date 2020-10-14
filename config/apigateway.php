@@ -1,7 +1,6 @@
 <?php
 
 return [
-	'prefix' => '/api',
 	'trusted_ips' => [
 		'10.7.0.0/16', // Docker Cloud
         '103.21.244.0/22', // Cloud Flare

@@ -8,6 +8,7 @@
         "php": "^7.2.5",
         "ackintosh/ganesha": "^1.1",
         "breeze2/slumen": "^1.3",
+        "darkaonline/swagger-lume": "7.*",
         "dusterio/lumen-passport": "^0.2.19",
         "growinc/lib-gateway-cache": "dev-master",
         "guzzlehttp/guzzle": "^7.0",
