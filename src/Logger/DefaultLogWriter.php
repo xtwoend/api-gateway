@@ -2,6 +2,7 @@
 
 namespace Api\Gateway\Logger;
 
+use Api\Gateway\Logger\DBLogger;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
@@ -27,9 +28,28 @@ class DefaultLogWriter implements LogWriter
 
         $user = json_encode($request->user());
 
-        $message = "[ {$method} {$uri} ] - User: {$user} - Body: {$bodyAsJson} - Headers: {$headersAsJson} - Files: {$files} - Response: [{$response->status()}] {$response->content()}";
+        $this->dbLogger($method, $uri, $bodyAsJson, $files, $headersAsJson, $user, $response->status(), $response->content());
+    }
 
-        Log::channel(config('apigateway.logger.channel'))->info($message);
+    public function dbLogger(...$args)
+    {
+        list($method, $uri, $body, $files, $headers, $user, $status, $response) = $args;
+
+        try {
+            DBLogger::create([
+                'uri'       => $uri,
+                'method'    => $method,
+                'user'      => $user,
+                'headers'   => $headers,
+                'body'      => $body,
+                'files'     => $files,
+                'response'  => $response,
+                'status'    => $status
+            ]);
+        } catch (\Exception $e) {
+            $message = "[ {$method} {$uri} ] - User: {$user} - Body: {$body} - Headers: {$headers} - Files: {$files} - Response: [{$status}] {$response}";
+            Log::channel(config('apigateway.logger.channel'))->info($message);
+        }
     }
 
     public function flatFiles($file)

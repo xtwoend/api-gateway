@@ -79,7 +79,7 @@ return [
             'prefix' => env('DB_PREFIX', ''),
         ],
 
-        'mongodb' => [
+        'logger' => [
             'driver' => 'mongodb',
             'host' => env('DB_LOG_HOST', '127.0.0.1'),
             'port' => env('DB_LOG_PORT', 27017),

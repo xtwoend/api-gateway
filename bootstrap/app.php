@@ -27,6 +27,10 @@ $app = new \Dusterio\LumenPassport\Lumen7Application(
     dirname(__DIR__)
 );
 
+// db for logger
+$app->register(Jenssegers\Mongodb\MongodbServiceProvider::class);
+
+
 $app->withFacades();
 $app->withEloquent();
 
@@ -41,14 +45,14 @@ $app->withEloquent();
 |
 */
 
-// $app->singleton(
-//     Illuminate\Contracts\Debug\ExceptionHandler::class,
-//     App\Exceptions\Handler::class
-// );
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
-    Api\Gateway\Exceptions\ApiHandler::class
+    App\Exceptions\Handler::class
 );
+// $app->singleton(
+//     Illuminate\Contracts\Debug\ExceptionHandler::class,
+//     Api\Gateway\Exceptions\ApiHandler::class
+// );
 
 $app->singleton(
     Illuminate\Contracts\Console\Kernel::class,
@@ -124,8 +128,6 @@ $app->register(Api\Gateway\ApiGatewayServiceProvider::class);
 // swagger ui for api docs
 $app->register(\SwaggerLume\ServiceProvider::class);
 
-// db for logger
-$app->register(Jenssegers\Mongodb\MongodbServiceProvider::class);
 
 if (class_exists('Laravel\Tinker\TinkerServiceProvider')) {
     $app->register(Laravel\Tinker\TinkerServiceProvider::class);

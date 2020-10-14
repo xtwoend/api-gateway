@@ -13,6 +13,7 @@
         "growinc/lib-gateway-cache": "dev-master",
         "guzzlehttp/guzzle": "^7.0",
         "illuminate/redis": "^7.0",
+        "jenssegers/mongodb": "^3.7.0",
         "laravel/lumen-framework": "^7.0"
     },
     "require-dev": {
