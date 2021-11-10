@@ -2,6 +2,7 @@
 
 namespace Xtwoend\ApiGateway\Router;
 
+use Hyperf\Utils\Codec\Json;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Xtwoend\ApiGateway\Http\HttpClientInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
@@ -40,10 +41,15 @@ class RouteHandler
         $serviceResponse = $this->client->request($this->route, $parametersJar);
         
         if ($serviceResponse && $serviceResponse->getStatusCode() >= 500) {
-            return $response->json([
+           
+            $response->getBody()->write(Json::encode([
                 'error' => 500,
-                'message' => 'ops.. someting wrong.',
-            ], 500);
+                'message' => 'ops.. someting wrong.', 
+            ]));
+            
+            return $response
+                ->withHeader('Content-Type', 'application/json;charset=utf-8')
+                ->withStatus(500);
         }
 
         $content = $serviceResponse->getBody()->getContents();

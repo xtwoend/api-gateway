@@ -153,7 +153,7 @@ class HttpClient implements HttpClientInterface
      */
     public function getBody()
     {
-        return $this->guzzleParams['body'];
+        return $this->guzzleParams['body'] ?? null;
     }
 
     /**
@@ -181,8 +181,8 @@ class HttpClient implements HttpClientInterface
         foreach ($files as $key => $file) {
             $this->guzzleParams['multipart'][] = [
                 'name' => $key,
-                'contents' => fopen($file->getRealPath(), 'r'),
-                'filename' => $file->getClientOriginalName()
+                'contents' => fopen($file->getPath(), 'r'),
+                'filename' => $file->getClientFilename()
             ];
         }
 
