@@ -1,0 +1,27 @@
+{
+    "name": "xtwoend/api-gateway",
+    "description": "Api gateway for hyperf",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Abdul Hafidz Anshari",
+            "email": "aditans88@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Xtwoend\\ApiGateway\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "require": {},
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        },
+        "hyperf": {
+            "config": "Xtwoend\\ApiGateway\\ConfigProvider"
+        }
+    }
+}
