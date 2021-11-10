@@ -12,6 +12,7 @@ declare(strict_types=1);
  */
 namespace Xtwoend\ApiGateway\Service;
 
+use Hyperf\DbConnection\Db;
 use Xtwoend\ApiGateway\Service\Service;
 use Xtwoend\ApiGateway\Exception\ServiceDownException;
 
@@ -40,6 +41,23 @@ final class Resolver implements ServiceRegistryContract
             throw new ServiceDownException("Service down");
         }
 
+        // counter
+        $this->putHit($service);
+
         return $service;
+    }
+
+    /**
+     * simpan hit ke dalam database
+     *
+     * @param [type] $service
+     * @return void
+     */
+    private function putHit($service)
+    {
+        Db::table('services')->where('id', $service->getId())
+        ->update([
+            'hit' => $service->getHit()
+        ]);
     }
 }

@@ -45,7 +45,7 @@ class Service implements ServiceContract
         int $limit = -1,
         int $weight = 1,
         $down = false,
-        $hit = 0,
+        int $hit = 0,
         $version = null,
         $default = null
     ) {
