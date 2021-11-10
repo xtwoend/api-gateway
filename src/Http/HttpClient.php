@@ -303,8 +303,6 @@ class HttpClient implements HttpClientInterface
 
         $service = $this->services->resolveInstance($services);
 
-        // put hit service
-
         // set current service for manage error service
         $this->currentService = $service;
 

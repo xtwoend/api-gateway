@@ -24,6 +24,12 @@ class RouteHandler
 
     public function request(RequestInterface $request, ResponseInterface $response)
     {
+        // mock request
+        if ($this->route->getType() === 'mock') {
+            return $this->mockRequest($request, $response);
+        }
+
+        // http request
         $this->client->setBody($request->getBody()->getContents());
 
         if (count($request->getUploadedFiles()) > 0) {
@@ -72,5 +78,29 @@ class RouteHandler
                 'query_string' => $request->getQueryString()
             ]
         );
+    }
+
+    private function mockRequest($request, $response)
+    {
+        $start = microtime(true);
+        $parametersJar = $this->parametersJar($request);
+        $execution = microtime(true) - $start;
+
+        $headers = [
+            'X-Time-Execution' => $execution,
+            'X-Mode' => $this->route->getType()
+        ] + $this->route->getHeaders();
+
+        $content = $this->route->getContent();
+
+        foreach ($headers as $header => $value) {
+            $response = $response->withHeader($header, $value);
+        }
+
+        $response = $response->getBody()->write($content);
+
+        return $response
+            ->withHeader('Content-Type', 'application/json;charset=utf-8')
+            ->withStatus(200);
     }
 }
