@@ -85,19 +85,22 @@ class RouteHandler
         $start = microtime(true);
         $parametersJar = $this->parametersJar($request);
         $execution = microtime(true) - $start;
-
-        $headers = [
+        
+        $defHeaders = json_decode($this->route->getHeaders());
+        
+        $headers = array_merge([
             'X-Time-Execution' => $execution,
             'X-Mode' => $this->route->getType()
-        ] + $this->route->getHeaders();
+        ], $defHeaders);
 
         $content = $this->route->getContent();
+
 
         foreach ($headers as $header => $value) {
             $response = $response->withHeader($header, $value);
         }
-
-        $response = $response->getBody()->write($content);
+        
+        $response->getBody()->write($content);
 
         return $response
             ->withHeader('Content-Type', 'application/json;charset=utf-8')
