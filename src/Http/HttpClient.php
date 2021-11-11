@@ -244,11 +244,11 @@ class HttpClient implements HttpClientInterface
         $user = $request->getAttribute('user');
         $scopes = $request->getAttribute('oauth_scopes') ?? [];
         $project = $request->getAttribute('project') ?? '{}';
-        $locale = $request->getHeaderLine('accept-language') ?: 'id';
+        $locale = $request->getHeaderLine('accept-language') ?: 'id_ID';
         $locale = locale_accept_from_http($locale);
-
+       
         $this->setHeaders([
-            'X-User' => $user->id ?? self::USER_ID_ANONYMOUS,
+            'X-User' => $user ? $user->getIdentifier() : self::USER_ID_ANONYMOUS,
             'X-Token-Scopes' => implode(',', $scopes),
             'X-Forwarded-For' => $request->getAttribute('ip'),
             'X-Project' => $project,
