@@ -4,6 +4,7 @@ namespace Xtwoend\ApiGateway;
 
 use Xtwoend\ApiGateway\Router\RouteFactory;
 use Xtwoend\ApiGateway\Router\RouteRegistry;
+use Xtwoend\ApiGateway\Command\ClearCacheCommand;
 
 
 class ConfigProvider
@@ -22,7 +23,7 @@ class ConfigProvider
                 ],
             ],
             'commands' => [
-                // 
+                ClearCacheCommand::class
             ],
             'publish' => [
                 [
