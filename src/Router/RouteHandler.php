@@ -66,15 +66,15 @@ class RouteHandler
                 ->withStatus($serviceResponse->getStatusCode());
 
         } catch (\Throwable $th) {
-            
+
             $response->getBody()->write(Json::encode([
-                'error' => 500,
+                'error' => $th->getCode(),
                 'message' => $th->getMessage(), 
             ]));
         
             return $response
                 ->withHeader('Content-Type', 'application/json;charset=utf-8')
-                ->withStatus(500);
+                ->withStatus(503);
         }
     }
 
