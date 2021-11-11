@@ -15,7 +15,17 @@
         }
     },
     "minimum-stability": "dev",
-    "require": {},
+    "require": {
+        "growinc/ip-middleware": "0.1.x-dev",
+        "hyperf/cache": "~2.2.0",
+        "hyperf/config": "~2.2.0",
+        "hyperf/command": "~2.2.0",
+        "hyperf/db-connection": "~2.2.0",
+        "hyperf/guzzle": "~2.2.0",
+        "hyperf/rate-limit": "~2.2.0",
+        "hyperf/http-server": "~2.2.0",
+        "hyperf/redis": "~2.2.0"
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"
