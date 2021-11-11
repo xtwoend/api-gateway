@@ -1,22 +1,34 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * This file is part of Hyperf.
+ *
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ */
 namespace Xtwoend\ApiGateway\Http;
 
 use GuzzleHttp\Client;
-use Hyperf\Utils\Collection;
-use Hyperf\HttpServer\Request;
-use Hyperf\Guzzle\ClientFactory;
-use Xtwoend\ApiGateway\Service\Service;
 use GuzzleHttp\Exception\ConnectException;
-use Xtwoend\ApiGateway\Http\GuzzleHandler;
-use Xtwoend\ApiGateway\Router\RouteContract;
-use Xtwoend\ApiGateway\Http\HttpClientInterface;
+use GuzzleHttp\Exception\RequestException;
+use Hyperf\HttpServer\Request;
+use Hyperf\Utils\Collection;
 use Xtwoend\ApiGateway\Exception\ServiceDownException;
+use Xtwoend\ApiGateway\Exception\ServiceErrorException;
+use Xtwoend\ApiGateway\Router\RouteContract;
+use Xtwoend\ApiGateway\Service\Service;
 use Xtwoend\ApiGateway\Service\ServiceRegistryContract;
-
 
 class HttpClient implements HttpClientInterface
 {
+    /**
+     * @var int
+     */
+    public const USER_ID_ANONYMOUS = -1;
+
     /**
      * @var \Hyperf\Guzzle\ClientFactory
      */
@@ -28,7 +40,7 @@ class HttpClient implements HttpClientInterface
     protected $services;
 
     /**
-     * [$currentService description]
+     * [$currentService description].
      * @var [type]
      */
     protected $currentService;
@@ -42,21 +54,14 @@ class HttpClient implements HttpClientInterface
     ];
 
     /**
-     * Undocumented variable
+     * Undocumented variable.
      *
      * @var \Hyperf\HttpServer\Request
      */
     protected $request;
 
     /**
-     * @var int
-     */
-    public const USER_ID_ANONYMOUS = -1;
-
-    /**
      * RestClient constructor.
-     * @param ServiceRegistryContract $services
-     * @param Request $request
      */
     public function __construct(
         ServiceRegistryContract $services,
@@ -75,31 +80,6 @@ class HttpClient implements HttpClientInterface
         $this->injectHeaders($request);
     }
 
-    /**
-     * @param \Hyperf\HttpServer\Request $request
-     */
-    private function injectHeaders(Request $request)
-    {
-        $user = $request->getAttribute('user');
-        $scopes = $request->getAttribute('oauth_scopes') ?? [];
-        $project = $request->getAttribute('project') ?? "{}";
-
-        [$locale] = explode("_", locale_accept_from_http($request->getHeaderLine('accept-language', 'id')));
-
-        $this->setHeaders([
-            'X-User' => $user->id ?? self::USER_ID_ANONYMOUS,
-            'X-Token-Scopes' => implode(",", $scopes),
-            'X-Forwarded-For' => $request->getAttribute('ip'),
-            'X-Project' =>  $project,
-            'Accept-Language' => $locale,
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json'
-        ]);
-    }
-
-    /**
-     * @param array $headers
-     */
     public function setHeaders(array $headers)
     {
         $this->guzzleParams['headers'] = $headers;
@@ -147,9 +127,7 @@ class HttpClient implements HttpClientInterface
     }
 
     /**
-     * Undocumented function
-     *
-     * @return void
+     * Undocumented function.
      */
     public function getBody()
     {
@@ -167,7 +145,7 @@ class HttpClient implements HttpClientInterface
             $this->getHeaders(),
             [
                 'X-User' => null,
-                'X-Token-Scopes' => null
+                'X-Token-Scopes' => null,
             ]
         ));
 
@@ -181,8 +159,8 @@ class HttpClient implements HttpClientInterface
         foreach ($files as $key => $file) {
             $this->guzzleParams['multipart'][] = [
                 'name' => $key,
-                'contents' => fopen($file->getPath(), 'r'),
-                'filename' => $file->getClientFilename()
+                'contents' => $file->getStream(),
+                'filename' => $file->getClientFilename(),
             ];
         }
 
@@ -191,6 +169,7 @@ class HttpClient implements HttpClientInterface
 
     /**
      * @param $url
+     * @param mixed $method
      * @return \Psr\Http\Message\ResponseInterface
      */
     public function exec($method, $url)
@@ -199,17 +178,16 @@ class HttpClient implements HttpClientInterface
     }
 
     /**
-     * @param RouteContract $route
      * @param array $parametersJar
-     * @return ResponseInterface
      * @throws ServiceDownException
+     * @return ResponseInterface
      */
     public function request(RouteContract $route, $parametersJar)
     {
         try {
             $method = strtolower($route->getMethod());
-            
-            if($method == 'any') {
+
+            if ($method == 'any') {
                 $method = $this->request->getMethod();
             }
 
@@ -218,19 +196,36 @@ class HttpClient implements HttpClientInterface
             }
 
             $url = $this->buildUrl($route, $parametersJar);
-            
-            $response = $this->exec($method, $url);
 
+            return $this->exec($method, $url);
         } catch (ConnectException $th) {
             throw new ServiceDownException('Connection failed: ' . $th->getMessage());
+        } catch (RequestException $th) {
+            throw new ServiceErrorException();
         }
+    }
 
-        return $response;
+    private function injectHeaders(Request $request)
+    {
+        $user = $request->getAttribute('user');
+        $scopes = $request->getAttribute('oauth_scopes') ?? [];
+        $project = $request->getAttribute('project') ?? '{}';
+
+        [$locale] = explode('_', locale_accept_from_http($request->getHeaderLine('accept-language', 'id')));
+
+        $this->setHeaders([
+            'X-User' => $user->id ?? self::USER_ID_ANONYMOUS,
+            'X-Token-Scopes' => implode(',', $scopes),
+            'X-Forwarded-For' => $request->getAttribute('ip'),
+            'X-Project' => $project,
+            'Accept-Language' => $locale,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ]);
     }
 
     /**
      * @param string $url
-     * @param array $params
      * @param string $prefix
      * @return string
      */
@@ -242,16 +237,14 @@ class HttpClient implements HttpClientInterface
             }
 
             if (is_string($value) || is_numeric($value)) {
-                $url = str_replace("{" . $prefix . $key . "}", $value, $url);
+                $url = str_replace('{' . $prefix . $key . '}', $value, $url);
             }
-            
         }
 
         return $url;
     }
 
     /**
-     * @param RouteContract $route
      * @param $parametersJar
      * @return string
      */
@@ -262,14 +255,14 @@ class HttpClient implements HttpClientInterface
         $method = $route->getMethod();
 
         if ($services->isEmpty()) {
-            throw new \Exception("No services available");
+            throw new \Exception('No services available');
         }
 
         $url = $this->injectParams($action, $parametersJar);
-        
-        if(strtolower($method) == 'any') {
+
+        if (strtolower($method) == 'any') {
             $route = $this->request->route('route');
-            $url = str_replace("{route:.+}", $route, $url);
+            $url = str_replace('{route:.+}', $route, $url);
         }
 
         if (isset($parametersJar['query_string'])) {
@@ -282,10 +275,7 @@ class HttpClient implements HttpClientInterface
     }
 
     /**
-     * Undocumented function
-     *
-     * @param \Hyperf\Utils\Collection $services
-     * @return Service
+     * Undocumented function.
      */
     private function resolover(Collection $services): Service
     {

@@ -25,55 +25,57 @@ class RouteHandler
 
     public function request(RequestInterface $request, ResponseInterface $response)
     {
-        // mock request
-        if ($this->route->getType() === 'mock') {
-            return $this->mockRequest($request, $response);
-        }
+        try {
 
-        // http request
-        $this->client->setBody($request->getBody()->getContents());
+            // mock request
+            if ($this->route->getType() === 'mock') {
+                return $this->mockRequest($request, $response);
+            }
 
-        if (count($request->getUploadedFiles()) > 0) {
-            $this->client->setFiles($request->getUploadedFiles());
-        }
+            // http request
+            $this->client->setBody($request->getBody()->getContents());
 
-        $parametersJar = $this->parametersJar($request);
-        $serviceResponse = $this->client->request($this->route, $parametersJar);
-        
-        if ($serviceResponse && $serviceResponse->getStatusCode() >= 500) {
-           
+            if (count($request->getUploadedFiles()) > 0) {
+                $this->client->setFiles($request->getUploadedFiles());
+            }
+
+            $parametersJar = $this->parametersJar($request);
+            $serviceResponse = $this->client->request($this->route, $parametersJar);
+            
+            $content = $serviceResponse->getBody()->getContents();
+            $response->getBody()->write($content);
+
+            foreach ($serviceResponse->getHeaders() as $key => $value) {
+                if (
+                    in_array($key, [
+                        'content-encoding',
+                        'content-length',
+                        'content-type',
+                        'transfer-encoding',
+                        'set-cookie'
+                    ])
+                ) {
+                    continue;
+                }
+
+                $response = $response->withHeader($key, $value[0]);
+            }
+
+            return $response
+                ->withHeader('Content-Type', 'application/json;charset=utf-8')
+                ->withStatus($serviceResponse->getStatusCode());
+
+        } catch (\Throwable $th) {
+            
             $response->getBody()->write(Json::encode([
                 'error' => 500,
-                'message' => 'ops.. someting wrong.', 
+                'message' => $th->getMessage(), 
             ]));
-            
+        
             return $response
                 ->withHeader('Content-Type', 'application/json;charset=utf-8')
                 ->withStatus(500);
         }
-
-        $content = $serviceResponse->getBody()->getContents();
-        $response->getBody()->write($content);
-
-        foreach ($serviceResponse->getHeaders() as $key => $value) {
-            if (
-                in_array($key, [
-                    'content-encoding',
-                    'content-length',
-                    'content-type',
-                    'transfer-encoding',
-                    'set-cookie'
-                ])
-            ) {
-                continue;
-            }
-
-            $response = $response->withHeader($key, $value[0]);
-        }
-
-        return $response
-            ->withHeader('Content-Type', 'application/json;charset=utf-8')
-            ->withStatus($serviceResponse->getStatusCode());
     }
 
     private function parametersJar(RequestInterface $request)
