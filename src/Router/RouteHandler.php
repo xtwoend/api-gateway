@@ -32,8 +32,10 @@ class RouteHandler
                 return $this->mockRequest($request, $response);
             }
 
+            $content = Json::encode($request->all());
+
             // http request
-            $this->client->setBody($request->getBody()->getContents());
+            $this->client->setBody($content);
 
             if (count($request->getUploadedFiles()) > 0) {
                 $this->client->setMultipartData($request->all());

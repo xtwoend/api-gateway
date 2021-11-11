@@ -224,6 +224,10 @@ class HttpClient implements HttpClientInterface
                 $this->setContentSize(strlen($this->getBody()));
             }
 
+            if(empty($this->guzzleParams['multipart'])) {
+                unset($this->guzzleParams['multipart']);
+            }
+        
             $url = $this->buildUrl($route, $parametersJar);
 
             return $this->exec($method, $url);
