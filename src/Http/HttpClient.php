@@ -50,6 +50,7 @@ class HttpClient implements HttpClientInterface
      */
     protected $guzzleParams = [
         'headers' => [],
+        'multipart' => []
         // 'debug' => true,
     ];
 
@@ -108,6 +109,34 @@ class HttpClient implements HttpClientInterface
     }
 
     /**
+     * Undocumented function
+     *
+     * @param array $form
+     * @return void
+     */
+    public function setMultipartData(array $form)
+    {
+        foreach ($form as $key => $value) {
+            $this->guzzleParams['multipart'][] = [
+                'name' => $key,
+                'contents' => $value,
+            ];
+        }
+
+        return $this;   
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return void
+     */
+    public function getMultipartData()
+    {
+        return $this->guzzleParams['multipart'];
+    }
+
+    /**
      * @return array
      */
     public function getHeaders()
@@ -154,7 +183,7 @@ class HttpClient implements HttpClientInterface
         }
 
         $this->guzzleParams['timeout'] = 20;
-        $this->guzzleParams['multipart'] = [];
+        // $this->guzzleParams['multipart'] = [];
 
         foreach ($files as $key => $file) {
             $this->guzzleParams['multipart'][] = [

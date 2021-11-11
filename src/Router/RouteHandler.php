@@ -36,6 +36,7 @@ class RouteHandler
             $this->client->setBody($request->getBody()->getContents());
 
             if (count($request->getUploadedFiles()) > 0) {
+                $this->client->setMultipartData($request->all());
                 $this->client->setFiles($request->getUploadedFiles());
             }
 
