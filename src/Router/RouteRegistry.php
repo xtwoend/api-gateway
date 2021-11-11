@@ -124,7 +124,7 @@ class RouteRegistry
             $registry = new self();
             if (config('api-gateway.cache', false)) {
                 if (! cache()->has('apigateway.routes')) {
-                    cache()->set('apigateway.routes', $registry->queryRoute(), config('router.cache_lifetime'));
+                    cache()->set('apigateway.routes', $registry->queryRoute(), config('api-gateway.cache_lifetime'));
                 }
                 $routes = cache()->get('apigateway.routes');
             } else {

@@ -30,18 +30,18 @@ class ClearCacheCommand extends HyperfCommand
         $this->container = $container;
         $this->cache = $cache;
 
-        parent::__construct('cache:clear');
+        parent::__construct('route:cache-clear');
     }
 
     public function configure()
     {
         parent::configure();
-        $this->setDescription('Flush the application cache');
+        $this->setDescription('Flush the application route cache');
     }
 
     public function handle()
     {
-        if ($this->cache->clear()) {
+        if ($this->cache->delete('apigateway.routes')) {
             $this->info('Cache clear successfuly.');
         }
     }

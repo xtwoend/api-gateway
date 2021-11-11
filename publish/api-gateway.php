@@ -2,6 +2,7 @@
 
 return [
     'cache' => false,
+    'cache_lifetime' => 9000,
     'middleware' => [
         'auth' => null,
         'project' => null
