@@ -30,6 +30,11 @@ class HttpClient implements HttpClientInterface
     public const USER_ID_ANONYMOUS = -1;
 
     /**
+     * @var int
+     */
+    public const PROJECT_ID_ANONYMOUS = -1;
+
+    /**
      * @var \Hyperf\Guzzle\ClientFactory
      */
     protected $client;
@@ -243,7 +248,7 @@ class HttpClient implements HttpClientInterface
     {
         $user = $request->getAttribute('user');
         $scopes = $request->getAttribute('oauth_scopes') ?? [];
-        $project = $request->getAttribute('project') ?? '{}';
+        $project = $request->getAttribute('project_id');
         $locale = $request->getHeaderLine('accept-language') ?: 'id_ID';
         $locale = locale_accept_from_http($locale);
        
@@ -251,7 +256,7 @@ class HttpClient implements HttpClientInterface
             'X-User' => $user ? $user->getIdentifier() : self::USER_ID_ANONYMOUS,
             'X-Token-Scopes' => implode(',', $scopes),
             'X-Forwarded-For' => $request->getAttribute('ip'),
-            'X-Project' => $project,
+            'X-Project' => $project ?: self::PROJECT_ID_ANONYMOUS,
             'Accept-Language' => $locale,
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
