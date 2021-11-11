@@ -76,6 +76,10 @@ class RouteRegistry
                 $middleware[] = config('api-gateway.middleware.auth');
             }
 
+            if(config('api-gateway.middleware.project')) {
+                $middleware[] = config('api-gateway.middleware.project');
+            }
+
             foreach ($route->getMiddleware() as $mid) {
                 array_push($middleware, $mid);
             }
