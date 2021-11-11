@@ -10,6 +10,8 @@ interface HttpClientInterface
     public function setHeaders(array $headers);
     public function setContentType($contentType);
     public function setContentSize($contentSize);
+    public function setMultipartData(array $form);
+    public function getMultipartData();
     public function getHeaders();
     public function setBody($body);
     public function getBody();
