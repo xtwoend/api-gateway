@@ -191,13 +191,14 @@ class HttpClient implements HttpClientInterface
                 $method = $this->request->getMethod();
             }
 
-            if (in_array($method, ['post', 'put', 'patch'])) {
+            if (in_array($method, ['post', 'put', 'patch']) && isset($this->guzzleParams['body'])) {
                 $this->setContentSize(strlen($this->getBody()));
             }
 
             $url = $this->buildUrl($route, $parametersJar);
 
             return $this->exec($method, $url);
+            
         } catch (ConnectException $th) {
             throw new ServiceDownException('Connection failed: ' . $th->getMessage());
         } catch (RequestException $th) {
@@ -210,8 +211,8 @@ class HttpClient implements HttpClientInterface
         $user = $request->getAttribute('user');
         $scopes = $request->getAttribute('oauth_scopes') ?? [];
         $project = $request->getAttribute('project') ?? '{}';
-
-        [$locale] = explode('_', locale_accept_from_http($request->getHeaderLine('accept-language', 'id')));
+        $locale = $request->getHeaderLine('accept-language') ?: 'id';
+        $locale = locale_accept_from_http($locale);
 
         $this->setHeaders([
             'X-User' => $user->id ?? self::USER_ID_ANONYMOUS,
