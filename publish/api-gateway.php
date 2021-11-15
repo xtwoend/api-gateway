@@ -5,6 +5,7 @@ return [
     'cache_lifetime' => 9000,
     'middleware' => [
         'auth' => null,
+        'basic' => null,
         'client' => null,
         'project' => null
     ],
