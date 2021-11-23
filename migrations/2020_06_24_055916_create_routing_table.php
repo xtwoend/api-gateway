@@ -73,12 +73,12 @@ class CreateRoutingTable extends Migration
             $table->boolean('active')->default(false);
             $table->boolean('deprecated')->default(false);
         
-            $table->unsignedBigInteger('group_id');
+            $table->unsignedBigInteger('group_id')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
 
             $table->timestamps();
 
-            $table->foreign('group_id')->references('id')->on('groups');
+            // $table->foreign('group_id')->references('id')->on('groups');
         });
 
         $this->schema->create('route_services', function (Blueprint $table) {

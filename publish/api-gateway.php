@@ -4,7 +4,7 @@ return [
     'cache' => false,
     'cache_lifetime' => 9000,
     'middleware' => [
-        'auth' => null,
+        'user' => null,
         'basic' => null,
         'client' => null,
         'project' => null
