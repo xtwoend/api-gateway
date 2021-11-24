@@ -14,17 +14,16 @@
             "Xtwoend\\ApiGateway\\": "src/"
         }
     },
-    "minimum-stability": "dev",
     "require": {
         "growinc/ip-middleware": "0.1.x-dev",
-        "hyperf/cache": "~2.2.0",
-        "hyperf/config": "~2.2.0",
-        "hyperf/command": "~2.2.0",
-        "hyperf/db-connection": "~2.2.0",
-        "hyperf/guzzle": "~2.2.0",
-        "hyperf/rate-limit": "~2.2.0",
-        "hyperf/http-server": "~2.2.0",
-        "hyperf/redis": "~2.2.0"
+        "hyperf/cache": "^2.2",
+        "hyperf/config": "^2.2",
+        "hyperf/command": "^2.2",
+        "hyperf/db-connection": "^2.2",
+        "hyperf/guzzle": "^2.2",
+        "hyperf/rate-limit": "^2.2",
+        "hyperf/http-server": "^2.2",
+        "hyperf/redis": "^2.2"
     },
     "extra": {
         "branch-alias": {

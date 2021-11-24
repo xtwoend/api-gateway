@@ -78,12 +78,18 @@ class RouteRegistry
                 $middleware[] = config('api-gateway.middleware.basic');
             }
 
+            if(in_array('client', $route->getMiddleware())) {
+                $middleware[] = config('api-gateway.middleware.client');
+            }
+
             if(config('api-gateway.middleware.project')) {
                 $middleware[] = config('api-gateway.middleware.project');
             }
 
             foreach ($route->getMiddleware() as $mid) {
-                array_push($middleware, $mid);
+                if (class_exists($mid)) {
+                    array_push($middleware, $mid);
+                }
             }
 
             $method = strtoupper($route->getMethod());
