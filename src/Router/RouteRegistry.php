@@ -74,8 +74,6 @@ class RouteRegistry
 
             if (! $route->isPublic()) {
                 $middleware[] = config('api-gateway.middleware.user');
-            } else {
-                $middleware[] = config('api-gateway.middleware.basic');
             }
 
             if(in_array('client', $route->getMiddleware())) {
