@@ -6,7 +6,6 @@ return [
     'middleware' => [
         'user' => null,
         'client' => null,
-        'basic' => null,
         'project' => null
     ],
     'http' => [
