@@ -68,6 +68,10 @@ class RouteRegistry
                 // \App\Middleware\ClientMiddleware::class,
             ];
 
+            if(config('api-gateway.middleware.project')) {
+                $middleware[] = config('api-gateway.middleware.project');
+            }
+
             if ($route->getRateLimit() > 0) {
                 $middleware[] = \Xtwoend\ApiGateway\Middleware\RateLimitMiddleware::class;
             }
@@ -79,11 +83,7 @@ class RouteRegistry
             if(in_array('client', $route->getMiddleware())) {
                 $middleware[] = config('api-gateway.middleware.client');
             }
-
-            if(config('api-gateway.middleware.project')) {
-                $middleware[] = config('api-gateway.middleware.project');
-            }
-
+            
             foreach ($route->getMiddleware() as $mid) {
                 if (class_exists($mid)) {
                     array_push($middleware, $mid);
