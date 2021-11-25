@@ -110,7 +110,7 @@ class RouteRegistry
                     return $handler->request($request, $response);
                 },
                 [
-                    'middleware' => $middleware,
+                    'middleware' => array_unique($middleware),
                     'route' => $route->getId()
                 ]
             );
