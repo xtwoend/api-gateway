@@ -172,7 +172,9 @@ class RouteRegistry
      */
     private function parseRoutes(array $routes)
     {
-        collect($routes)->each(function ($routeDetails) {
+        $routes = collect($routes);
+        $unique = $routes->unique('path');
+        $unique->values()->each(function ($routeDetails) {
             $routeDetails = (array) $routeDetails;
 
             $services = $routeDetails['services'];
