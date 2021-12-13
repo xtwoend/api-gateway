@@ -114,7 +114,7 @@ class RegisterServiceListener implements ListenerInterface
         if ($protocol === 'http') {
             $requestBody['Check'] = [
                 'DeregisterCriticalServiceAfter' => $deregisterCriticalServiceAfter,
-                'HTTP' => "http://{$host}:{$port}/",
+                'HTTP' => "http://{$host}:{$port}/ping",
                 'Interval' => $interval,
             ];
         }
