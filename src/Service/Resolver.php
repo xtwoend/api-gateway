@@ -56,7 +56,9 @@ final class Resolver implements ServiceRegistryContract
     {
         $governanceManager = make(DriverManager::class);
         $consulAddress = config('consul.uri', 'http://127.0.0.1:8500');
-        $nodes = $governanceManager->getNodes($consulAddress, $name, ['protocol' => 'http']);
+        $governance = $governanceManager->get(config('api-gateway.driver', 'consul'));
+
+        $nodes = $governance->getNodes($consulAddress, $name, ['protocol' => 'http']);
         if (empty($nodes)) {
             throw new ServiceDownException('No node alive.');
         }
