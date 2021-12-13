@@ -29,6 +29,7 @@ class CreateRoutingTable extends Migration
             $table->bigIncrements('id');
             $table->string('name')->index()->unique();
             $table->string('host');
+            $table->integer('port')->nullable();
             $table->boolean('enabled')->default(false);
             $table->boolean('default')->default(false);
             $table->string('prefix', 50)->nullable()->default('api');

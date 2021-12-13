@@ -5,6 +5,7 @@ namespace Xtwoend\ApiGateway;
 use Xtwoend\ApiGateway\Router\RouteFactory;
 use Xtwoend\ApiGateway\Router\RouteRegistry;
 use Xtwoend\ApiGateway\Command\ClearCacheCommand;
+use Xtwoend\ApiGateway\Listener\RegisterServiceListener;
 
 
 class ConfigProvider
@@ -21,6 +22,9 @@ class ConfigProvider
                         __DIR__,
                     ],
                 ],
+            ],
+            'listeners' => [
+                RegisterServiceListener::class
             ],
             'commands' => [
                 ClearCacheCommand::class

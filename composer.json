@@ -23,7 +23,8 @@
         "hyperf/guzzle": "^2.2",
         "hyperf/rate-limit": "^2.2",
         "hyperf/http-server": "^2.2",
-        "hyperf/redis": "^2.2"
+        "hyperf/redis": "^2.2",
+        "hyperf/consul": "^2.2"
     },
     "extra": {
         "branch-alias": {
