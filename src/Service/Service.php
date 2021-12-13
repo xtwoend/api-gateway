@@ -153,6 +153,12 @@ class Service implements ServiceContract
         return $this->host;
     }
 
+    public function setHost($host)
+    {
+        $this->host = $host;
+        return $this;
+    }
+
     public function getPrefix(): ?string
     {
         return $this->prefix;
