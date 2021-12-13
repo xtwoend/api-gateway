@@ -9,6 +9,8 @@ use Hyperf\Server\Event\MainCoroutineServerStart;
 use Hyperf\Consul\Exception\ServerException;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Psr\Container\ContainerInterface;
+use Hyperf\Contract\ConfigInterface;
+use Hyperf\ServiceGovernanceConsul\ConsulAgent;
 use Hyperf\DbConnection\Db;
 use Hyperf\Utils\Str;
 
@@ -21,6 +23,11 @@ class RegisterServiceListener implements ListenerInterface
     protected $logger;
 
     /**
+     * @var ConfigInterface
+     */
+    protected $config;
+
+    /**
      * @var DriverManager
      */
     protected $governanceManager;
@@ -31,6 +38,9 @@ class RegisterServiceListener implements ListenerInterface
     {
         $this->governanceManager = $container->get(DriverManager::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
+        $this->client = $container->get(ConsulAgent::class);
+        $this->config = $container->get(ConfigInterface::class);
+
     }
 
     public function listen(): array
@@ -65,7 +75,7 @@ class RegisterServiceListener implements ListenerInterface
                         $service['protocol'] = 'http';
                         unset($service['id']);
                         if (! $governance->isRegistered($serviceName, $address, (int) $port, $service)) {
-                            $governance->register($serviceName, $address, (int) $port, $service);
+                            $this->register($serviceName, $address, (int) $port, $service);
                         }
                     }
                 }
@@ -84,5 +94,69 @@ class RegisterServiceListener implements ListenerInterface
     private function getServers()
     {
         return Db::table('services')->select('*')->get();
+    }
+
+    public function register(string $name, string $host, int $port, array $metadata): void
+    {
+        $nextId = empty($metadata['id']) ? $this->generateId($this->getLastServiceId($name)) : $metadata['id'];
+        $protocol = $metadata['protocol'];
+        $deregisterCriticalServiceAfter = $this->config->get('services.drivers.consul.check.deregister_critical_service_after') ?? '90m';
+        $interval = $this->config->get('services.drivers.consul.check.interval') ?? '1s';
+        $requestBody = [
+            'Name' => $name,
+            'ID' => $nextId,
+            'Address' => $host,
+            'Port' => $port,
+            'Meta' => [
+                'Protocol' => $protocol,
+            ],
+        ];
+        if ($protocol === 'http') {
+            $requestBody['Check'] = [
+                'DeregisterCriticalServiceAfter' => $deregisterCriticalServiceAfter,
+                'HTTP' => "http://{$host}:{$port}/",
+                'Interval' => $interval,
+            ];
+        }
+        
+        $response = $this->client->registerService($requestBody);
+        if ($response->getStatusCode() === 200) {
+            $this->logger->info(sprintf('Service %s:%s register to the consul successfully.', $name, $nextId));
+        } else {
+            $this->logger->warning(sprintf('Service %s register to the consul failed.', $name));
+        }
+    }
+
+    protected function getLastServiceId(string $name)
+    {
+        $maxId = -1;
+        $lastService = $name;
+        $services = $this->client->services()->json();
+        foreach ($services ?? [] as $id => $service) {
+            if (isset($service['Service']) && $service['Service'] === $name) {
+                $exploded = explode('-', (string) $id);
+                $length = count($exploded);
+                if ($length > 1 && is_numeric($exploded[$length - 1]) && $maxId < $exploded[$length - 1]) {
+                    $maxId = $exploded[$length - 1];
+                    $lastService = $service;
+                }
+            }
+        }
+        return $lastService['ID'] ?? $name;
+    }
+
+    protected function generateId(string $name)
+    {
+        $exploded = explode('-', $name);
+        $length = count($exploded);
+        $end = -1;
+        if ($length > 1 && is_numeric($exploded[$length - 1])) {
+            $end = $exploded[$length - 1];
+            unset($exploded[$length - 1]);
+        }
+        $end = intval($end);
+        ++$end;
+        $exploded[] = $end;
+        return implode('-', $exploded);
     }
 }
