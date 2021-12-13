@@ -36,7 +36,7 @@ final class Resolver implements ServiceRegistryContract
             $service = $services->first();
         }
 
-        $host = $this->getNodes($service->name);
+        $host = $this->getNodes($service->getName());
         $service = $service->setHost($host);
         
         $service->hit();
