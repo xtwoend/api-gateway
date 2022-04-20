@@ -76,17 +76,16 @@ class RouteRegistry
                 $middleware[] = \Xtwoend\ApiGateway\Middleware\RateLimitMiddleware::class;
             }
 
-            if (! $route->isPublic()) {
-                $middleware[] = config('api-gateway.middleware.user');
-            }
-
-            if(in_array('client', $route->getMiddleware())) {
-                $middleware[] = config('api-gateway.middleware.client');
-            }
+            // if (! $route->isPublic()) {
+            //     $middleware[] = config('api-gateway.middleware.user');
+            // }
             
             foreach ($route->getMiddleware() as $mid) {
                 if (class_exists($mid)) {
                     array_push($middleware, $mid);
+                }
+                if (array_key_exists($mid, config('api-gateway.middleware'))) {
+                    array_push($middleware, config("api-gateway.middleware.{$mid}"));
                 }
             }
 
