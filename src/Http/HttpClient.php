@@ -253,7 +253,7 @@ class HttpClient implements HttpClientInterface
         // $locale = locale_accept_from_http($locale);
        
         $this->setHeaders([
-            'X-User' => $user ? $user->getIdentifier() : self::USER_ID_ANONYMOUS,
+            'X-User' => ! empty(get_object_vars($user)) ? $user->getIdentifier() : self::USER_ID_ANONYMOUS,
             'X-Token-Scopes' => implode(',', $scopes),
             'X-Forwarded-For' => $request->getAttribute('ip'),
             'X-Project' => $project ?: self::PROJECT_ID_ANONYMOUS,
