@@ -67,6 +67,10 @@ class RouteRegistry
                 // \App\Middleware\SubDomainMiddleware::class,
                 // \App\Middleware\ClientMiddleware::class,
             ];
+            
+            foreach(config('api-gateway.global.middleware.before', []) as $afterMid ) {
+                array_push($middleware, $afterMid);
+            }
 
             if(config('api-gateway.middleware.project')) {
                 $middleware[] = config('api-gateway.middleware.project');
@@ -87,6 +91,10 @@ class RouteRegistry
                 if (array_key_exists($mid, config('api-gateway.middleware'))) {
                     array_push($middleware, config("api-gateway.middleware.{$mid}"));
                 }
+            }
+
+            foreach(config('api-gateway.global.middleware.after', []) as $afterMid ) {
+                array_push($middleware, $afterMid);
             }
 
             $method = strtoupper($route->getMethod());
