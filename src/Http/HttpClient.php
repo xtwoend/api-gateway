@@ -276,6 +276,9 @@ class HttpClient implements HttpClientInterface
             }
 
             if (is_string($value) || is_numeric($value)) {
+                if(str_contains($url, ':.+')) {
+                    $url = str_replace(':.+', '', $url);
+                }
                 $url = str_replace('{' . $prefix . $key . '}', $value, $url);
             }
         }
