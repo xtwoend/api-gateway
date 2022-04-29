@@ -255,7 +255,7 @@ class HttpClient implements HttpClientInterface
         $this->setHeaders([
             'X-User' => ($user instanceof \OAuthServer\Entities\UserEntity) ? $user->getIdentifier() : self::USER_ID_ANONYMOUS,
             'X-Token-Scopes' => implode(',', $scopes),
-            'X-Forwarded-For' => $request->getAttribute('ip'),
+            'X-Forwarded-For' => $request->getHeaderLine('x-forwarded-for'),
             'X-Project' => $project ?: self::PROJECT_ID_ANONYMOUS,
             'Accept-Language' => $locale,
             'Content-Type' => 'application/json',
