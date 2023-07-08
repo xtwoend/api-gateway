@@ -57,7 +57,7 @@ class RegisterServiceListener implements ListenerInterface
      *
      * @param MainWorkerStart|MainCoroutineServerStart $event
      */
-    public function process(object $event)
+    public function process(object $event): void
     {
         $continue = true;
         while ($continue) {

@@ -3,6 +3,7 @@
 namespace Xtwoend\ApiGateway\Router;
 
 use Hyperf\Utils\Codec\Json;
+use Xtwoend\ApiGateway\Rpc\RpcClientInterface;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Xtwoend\ApiGateway\Http\HttpClientInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
@@ -10,6 +11,16 @@ use Hyperf\HttpServer\Contract\ResponseInterface;
 
 class RouteHandler
 {
+     /**
+     * @var int
+     */
+    public const USER_ID_ANONYMOUS = -1;
+
+    /**
+     * @var int
+     */
+    public const PROJECT_ID_ANONYMOUS = -1;
+
     protected $client;
     protected $route;
     protected $config;
@@ -30,6 +41,10 @@ class RouteHandler
             // mock request
             if ($this->route->getType() === 'mock') {
                 return $this->mockRequest($request, $response);
+            }
+
+            if ($this->route->getType() == 'rpc') {
+                return $this->rpcHandler($request, $response);
             }
 
             $content = Json::encode($request->all());
@@ -112,6 +127,37 @@ class RouteHandler
         }
         
         $response->getBody()->write($content);
+
+        return $response
+            ->withHeader('Content-Type', 'application/json;charset=utf-8')
+            ->withStatus(200);
+    }
+
+    private function rpcHandler($request, $response)
+    {
+        $user = $request->getAttribute('user');
+        $scopes = $request->getAttribute('oauth_scopes') ?? [];
+        $project = $request->getAttribute('project_id');
+        $locale = $request->getHeaderLine('accept-language') ?: 'id_ID';
+        
+        $query = $request->getQueryString();
+        $body = $request->getBody();
+        $headers = [
+            'X-User' => ($user instanceof \OAuthServer\Entities\UserEntity) ? $user->getIdentifier() : self::USER_ID_ANONYMOUS,
+            'X-Token-Scopes' => implode(',', $scopes),
+            'X-Forwarded-For' => $request->getHeaderLine('x-forwarded-for'),
+            'X-Project' => $project ?: self::PROJECT_ID_ANONYMOUS,
+            'Accept-Language' => $locale,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+        ];
+
+        $rpcClient = make(RpcClientInterface::class);
+        $result = $rpcClient::service($this->route->getCurrentService()->name)
+            ->params($query, $body, $headers)
+            ->call($this->route->getAction());
+
+        $response->getBody()->write(Json::encode($result));
 
         return $response
             ->withHeader('Content-Type', 'application/json;charset=utf-8')

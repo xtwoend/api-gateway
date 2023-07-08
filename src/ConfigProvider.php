@@ -2,8 +2,10 @@
 
 namespace Xtwoend\ApiGateway;
 
+use Xtwoend\ApiGateway\Rpc\RpcClient;
 use Xtwoend\ApiGateway\Router\RouteFactory;
 use Xtwoend\ApiGateway\Router\RouteRegistry;
+use Xtwoend\ApiGateway\Rpc\RpcClientInterface;
 use Xtwoend\ApiGateway\Command\ClearCacheCommand;
 use Xtwoend\ApiGateway\Listener\RegisterServiceListener;
 
@@ -15,6 +17,7 @@ class ConfigProvider
         return [
             'dependencies' => [
                 RouteRegistry::class => RouteFactory::class,
+                RpcClientInterface::class => RpcClient::class
             ],
             'annotations' => [
                 'scan' => [
