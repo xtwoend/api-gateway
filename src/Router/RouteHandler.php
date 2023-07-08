@@ -140,21 +140,21 @@ class RouteHandler
         $project = $request->getAttribute('project_id');
         $locale = $request->getHeaderLine('accept-language') ?: 'id_ID';
         
-        $query = $request->getQueryString();
-        $body = $request->getBody();
-        $headers = [
-            'X-User' => ($user instanceof \OAuthServer\Entities\UserEntity) ? $user->getIdentifier() : self::USER_ID_ANONYMOUS,
-            'X-Token-Scopes' => implode(',', $scopes),
-            'X-Forwarded-For' => $request->getHeaderLine('x-forwarded-for'),
-            'X-Project' => $project ?: self::PROJECT_ID_ANONYMOUS,
-            'Accept-Language' => $locale,
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
+        parse_str($request->getQueryString(), $queryString);
+        $query = array_merge($request->getAttribute('params'), $queryString);
+        $body = (string) $request->getBody();
+        $meta = [
+            'user' => ($user instanceof \OAuthServer\Entities\UserEntity) ? $user->getIdentifier() : self::USER_ID_ANONYMOUS,
+            'token_scopes' => implode(',', $scopes),
+            'ip_address' => $request->getHeaderLine('x-forwarded-for'),
+            'project' => $project ?: self::PROJECT_ID_ANONYMOUS,
+            'locale' => $locale
         ];
 
+        $service = $this->route->getServices()->first();
         $rpcClient = make(RpcClientInterface::class);
-        $result = $rpcClient::service($this->route->getCurrentService()->name)
-            ->params($query, $body, $headers)
+        $result = $rpcClient::service($service->getName())
+            ->params($query, Json::decode($body), $meta)
             ->call($this->route->getAction());
 
         $response->getBody()->write(Json::encode($result));
